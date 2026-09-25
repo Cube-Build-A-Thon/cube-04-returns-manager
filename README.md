@@ -1,130 +1,326 @@
-# CUBE Buildathon 2026 · 04 · Returns Manager
+# Cube Buildathon · 04 · Returns Manager
 
-**Commerce Context stream · Sydon Symphony sandbox · Two-week build**
+**Round 2 · Individual Build**
 
 > Five agents, one unit, one record that follows it.
-> A physical product arrives, gets prepped, gets shipped, comes back. At every step a person makes a fast judgment that nobody records. Your pod builds the agent that makes one of those judgments, and leaves proof.
+> A physical product arrives, gets prepped, gets shipped, comes back. At every step a fast operational judgment has to be made and recorded.
 
 **New here? Read these first:**
-1. [`GITHUB-GUIDE.md`](GITHUB-GUIDE.md) explains how to create your branch, where to put your work and how to open a PR.
-2. [`RULES.md`](RULES.md) covers the repository rules (enforced) and the five engineering rules (assessed).
+
+1. [`GITHUB-GUIDE.md`](GITHUB-GUIDE.md) explains how to fork the repository, set it up, build and push your work.
+2. [`RULES.md`](RULES.md) covers the repository and engineering rules.
 
 ---
 
 ## Your problem statement: Returns Manager
 
-| | |
-|---|---|
-| **Position in the chain** | Step 4 of 5. Customer return. |
-| **Customer** | Seller, or prep center acting for one |
-| **What gets recorded** | Condition and disposition |
-| **Who consumes your output** | Recovery Manager (returns that were not returned, came back damaged, or are not the item sold) |
+|                              |                                       |
+| ---------------------------- | ------------------------------------- |
+| **Position in the chain**    | Step 4 of 5 · Customer return         |
+| **Customer**                 | Seller, or prep center acting for one |
+| **What gets recorded**       | Condition and disposition             |
+| **Who consumes your output** | Recovery Manager                      |
 
-Someone opens a returned parcel. In a few seconds they decide: is this the item we sold, is it complete, what condition is it in, and what do we do with it. Today that decision is a guess by an untrained person, it varies between operators and between shifts, and nothing about it is recorded.
+Someone opens a returned parcel. In a few seconds they need to decide:
 
-**What the agent returns, from two or three phone photographs:**
+* Is this the item we sold?
+* Is it complete?
+* What condition is it in?
+* What should happen to it next?
 
-- Identity against the seller's own catalogue. Is this the ASIN that was ordered?
-- Completeness against a parts list: accessories, manuals, cables
-- Condition on Amazon's published condition scale. Use theirs. Do not invent one.
-- Disposition: restock, refurbish, liquidate, dispose
+Your agent should make that process structured, consistent and evidence-backed.
+
+### What the agent returns
+
+From appropriate visual/input evidence, the Returns Manager should determine:
+
+* **Identity** against the seller's own catalogue. Is this the ASIN/SKU that was ordered?
+* **Completeness** against the expected parts list: accessories, manuals, cables and other required components.
+* **Condition** using the published condition scale. Do not invent your own condition scale.
+* **Disposition**, such as `restock`, `refurbish`, `liquidate`, `dispose` or `pending_review`.
 
 > Moving even a few percent of returns from liquidation to restock is direct margin. That is the commercial case in one sentence.
 
-> **Pods on this statement have the worked example. Your bar is higher.** You are expected to find what the example got wrong.
+---
 
-### The chain you are part of
+## The chain you are part of
 
-```
+```text
  Supplier delivery      Inbound to Amazon     Outbound to buyer     Customer return        Money back
  ┌──────────────┐      ┌──────────────┐      ┌──────────────┐      ┌──────────────┐      ┌──────────────┐
- │ 01 Receiving │ ───▶ │ 02 Prep      │ ───▶ │ 03 Pack      │ ───▶ │ 04 Returns   │      │ 05 Recovery  │
+ │ 01 Receiving │ ───▶ │ 02 Prep      │ ───▶ │ 03 Pack      │ ───▶ │ 04 Returns   │ ───▶ │ 05 Recovery  │
  │ condition on │      │ compliance   │      │ contents at  │      │ condition &  │      │ reads all    │
  │ arrival      │      │ proof        │      │ seal         │      │ disposition  │      │ four → claim │
- └──────┬───────┘      └──────┬───────┘      └──────┬───────┘      └──────┬───────┘      └──────▲───────┘
-        └─────────────────────┴─────────────────────┴─────────────────────┴─────────────────────┘
+ └──────────────┘      └──────────────┘      └──────────────┘      └──────────────┘      └──────────────┘
 ```
 
-The first four are the same machine: a camera, a model, and a decision bound to a record. What changes is the ruleset, the buyer and the moment. The fifth has no camera. It turns the other four's records into a claim.
+The first four Managers generate operational evidence. Recovery Manager consumes those records downstream.
 
-Your output has to be usable by another pod. That's deliberate, and it's scored.
+Your output should therefore be structured, traceable and usable by the next stage.
 
 ---
 
 ## Reference data
 
-`data/` holds a **dummy** CSV for reference while you design and build. Its columns and meanings are listed in [`data/README.md`](data/README.md).
+`data/` contains **synthetic** reference data for development and testing. See [`data/README.md`](data/README.md) for the field definitions.
 
-**The data is synthetic.** The SKUs, ASINs, FNSKUs, orders, suppliers, operators and amounts are all invented. The requirement flags and fee amounts are **not** Amazon's real rules or fees. Engineering rule 5 applies: look the authoritative rule up. The `photo_refs` paths are placeholders, and no images ship with this repo. Your fixtures and eval set are yours to capture.
+The SKUs, ASINs, FNSKUs, orders, suppliers, operators and amounts are invented. Requirement flags and fee amounts are **not** authoritative Amazon rules or fees.
 
-All five buildathon repos share the same `unit_id` values (`UNIT-0001` … `UNIT-0100`). You can follow one unit from receiving through recovery, the same way the real records will be joined. In the sample, each unit takes one route: **FBA** (prep, then Amazon ships it and charges fees) or **merchant-fulfilled / 3PL** (the seller packs it). So a unit has a Prep record or a Pack record, never both.
+The `photo_refs` values are placeholders, and images are not included with this repository. Create or use appropriate fixtures for development and evaluation.
 
-
-
----
-
-## How this works
-
-**You will not be handed a spec.** Real products are built backwards from the customer and forwards through the evidence. You write what the customer would say before you write code. You write the press release as if it already shipped. You write down the number that would make you stop. Then you build, and then you measure whether any of it was true.
-
-Every one of those documents exists to be proven wrong cheaply. A wrong assumption caught in a paragraph costs an hour. The same assumption caught in code costs a week. You are assessed on that as much as on running software.
-
-### What you're given
-- This problem statement
-- A domain brief covering the real economics, fee structures and what a working day in a warehouse looks like *(shared by the organisers)*
-- The engineering rules in [`RULES.md`](RULES.md)
-- Sandbox access and a shared catalogue
-- One fully worked package for Returns Manager (customer letter, PR/FAQ, one-pager) as a reference for the standard expected. **Read it. Don't copy it.**
-
-### What you produce, in `submissions/<your-github-username>/`
-- A customer letter in your customer's voice
-- A PR/FAQ, including the questions you'd rather not answer
-- A one-pager with a metrics table and a **kill condition**
-- A `CLAUDE.md` and a build brief
-- A build log you keep current
-- An eval report with numbers and named failure modes
-- A working agent
-
-## The build sequence: six faces, in order
-
-Each face has a deliverable. Don't skip forward.
-
-| Face | Deliverable | The point |
-|---|---|---|
-| **1 · Outcome first** | Customer letter, PR/FAQ, one-pager. **No code.** | Write it honestly enough that it might argue against your own agent. Include at least one kill condition. |
-| **2 · Context** | `CLAUDE.md` | Durable constraints, hard rules, where things live, and language you are not allowed to use. |
-| **3 · Tools** | A working agent, headless first | Get it running against fixture images from a CLI before any UI. |
-| **4 · Evals & guardrails** | A measured number, with its method | 50 unseen units. Two humans label each one independently, and you measure them against each other first. Report per check, with FP and FN separately. |
-| **5 · Decision tracing** | The evidence record | Photos, timestamp, operator, every check and verdict, model version, overrides with reasons, and a content hash. Build it for a customer to read. |
-| **6 · Agent comms** | Your output, consumed by another pod | Agree the cross-pod contract in week one, then hold it. |
-
-## Two weeks
-
-| Days | Work | Gate to move on |
-|---|---|---|
-| 1–2 | Customer letter, PR/FAQ, one-pager, CLAUDE.md. No code. | Another pod reads your one-pager and states your kill condition back to you |
-| 3–4 | Schema and tenancy isolation. Headless agent, batched call, structured output. | Isolation test green. Agent runs on fixtures from a CLI. |
-| 5–7 | Capture surface, decision screen, override capture. | Works on a real phone, on cellular, not office wifi |
-| 8–10 | Evidence record page. Cross-pod contract. Fail-open behaviour. | Another pod's agent can read your records |
-| 11–13 | Eval set, two human labellers, measurement. Fix what it surfaces. | A number per check, with failure modes written down |
-| 14 | Present | — |
-
-## Day 14: what you present (five minutes, in this order)
-
-1. **The customer.** Who they are and what their day looks like (30 seconds).
-2. **What you measured.** Accuracy per check, false positives and negatives, failure modes.
-3. **The record,** as a customer would see it.
-4. **One unit, live, end to end.** If it fails live, explain why.
-5. **Your kill condition,** and whether your evidence tripped it.
-
-> A pod reporting an honest 61% that knows exactly why will score above a pod reporting 95% it cannot break down.
-
-## What we're being straight with you about
-
-- **The core assumption is untested.** Nobody knows yet whether vision models can identify products and grade condition on long-tail catalogues without per-SKU training. Finding out that it doesn't hold, and documenting that clearly, counts as a successful outcome.
-- **Nobody has spoken to a customer yet.** If you can get a real prep center or seller on a call, ask them to rank the five problems by urgency. Don't ask whether they'd buy what you're building.
-- **The background documents disagree in places.** A contradiction is a finding. Raise it as an Issue labelled `finding`.
+All five Buildathon repositories share the same conceptual `unit_id` values, allowing a unit to be followed through the operational chain.
 
 ---
 
-*CUBE Buildathon · Commerce Context stream · Sydon Symphony sandbox*
+## How to build
+
+This is an **individual Round 2 build**.
+
+### Your workflow
+
+```text
+Fork
+  ↓
+Clone
+  ↓
+Understand the problem
+  ↓
+Build
+  ↓
+Test
+  ↓
+Evaluate
+  ↓
+Document
+  ↓
+Deploy / Demo
+  ↓
+Submit
+```
+
+Build your solution in **your own fork** of this repository.
+
+You do not need to create a participant folder in the organiser repository or open a pull request into the organiser repository.
+
+---
+
+## What you should focus on
+
+Your Returns Manager should be able to:
+
+```text
+Input / Return Evidence
+        ↓
+     Identity
+        ↓
+   Completeness
+        ↓
+     Condition
+        ↓
+    Disposition
+        ↓
+Structured Evidence Record
+```
+
+The exact internal architecture is up to you.
+
+Focus on making the core workflow work reliably before adding unnecessary features.
+
+A worked Returns example may be available in the repository resources. **Read it to understand the expected standard. Do not simply copy it.**
+
+---
+
+## Evidence & Decision Traceability
+
+Your agent should produce structured evidence for its decisions.
+
+The official evidence contract includes concepts such as:
+
+* `record_id`
+* `schema_version`
+* `organization_id`
+* `client_id`
+* `agent`
+* `subject`
+* `captured_at`
+* `operator_label`
+* `images`
+* `checks`
+* `outcome`
+* `overrides`
+* `status`
+
+Each check should make the result understandable through its verdict, confidence and supporting detail where applicable.
+
+Use:
+
+* **PASS** when the evidence supports the condition.
+* **FAIL** when the evidence supports that the condition is not met.
+* **UNCERTAIN** when the evidence is insufficient for a reliable judgment.
+
+`UNCERTAIN` is a valid outcome. Do not force ambiguous cases into PASS or FAIL.
+
+---
+
+## Cross-Manager Compatibility
+
+Round 2 is individual, but your output will eventually be consumed by Recovery Manager.
+
+Use the **official evidence contract provided by the organisers** as the baseline for interoperability.
+
+Do not create a separate negotiated cross-pod contract for Round 2.
+
+Your decision should allow another system to understand:
+
+```text
+What was returned?
+      ↓
+What was checked?
+      ↓
+What did the agent decide?
+      ↓
+Why?
+      ↓
+What evidence supports it?
+```
+
+---
+
+## Engineering expectations
+
+Keep the system practical and reliable.
+
+### Tenancy isolation
+
+If you store persistent data, organisation/client data should remain properly isolated.
+
+### Efficient model usage
+
+Avoid unnecessary repeated model calls. Batch related reasoning where appropriate.
+
+### Fail open
+
+If a model or dependency fails, do not silently discard the input. Preserve the available information and move the case into an appropriate pending/review state.
+
+### Authoritative rules
+
+Where an external rule or requirement is needed, use the authoritative source rather than relying on model memory or synthetic sample values.
+
+---
+
+## Evaluation
+
+Evaluation is part of your Round 2 score.
+
+For the visual checks, build an appropriate unseen/held-out evaluation set. Where applicable, use at least **50 unseen units** and have two humans independently label the cases before comparing agent performance.
+
+Report:
+
+* results per important check,
+* false positives,
+* false negatives,
+* `UNCERTAIN` / review rate,
+* important failure modes,
+* latency/cost where relevant.
+
+Do not evaluate only on examples that make the system look successful.
+
+For condition and other visual checks, use genuinely varied cases, including difficult or ambiguous examples.
+
+---
+
+## Round 2 evaluation — 100 points
+
+| Criterion                                    |  Points |
+| -------------------------------------------- | ------: |
+| Problem Understanding & Solution Relevance   |  **15** |
+| Agent Functionality & Decision Quality       |  **25** |
+| Evaluation, Accuracy & Uncertainty Handling  |  **25** |
+| Evidence, Traceability & Engineering Quality |  **20** |
+| UX, Demo & Documentation                     |  **15** |
+| **TOTAL**                                    | **100** |
+
+Your Round 2 score is important because participants selected for Round 3 will carry their Round 2 score into the final combined result.
+
+---
+
+## Submission
+
+### Submissions open
+
+**27 September 2026**
+
+### Final deadline
+
+**1 October 2026 · 6:00 PM IST**
+
+The submission form closes permanently at the deadline.
+
+**There is no reopening and no resubmission.**
+
+Your final submission should include:
+
+* your GitHub fork,
+* working implementation,
+* `README.md`,
+* `ARCHITECTURE.md`,
+* evaluation results,
+* demo video,
+* deployment URL where applicable,
+* required submission links.
+
+### LinkedIn — Mandatory
+
+You must publish a LinkedIn post about your Round 2 build.
+
+The post must:
+
+* mention your Returns Manager build,
+* explain what you built,
+* tag **CodeQuesters**,
+* tag **Sydon.AI**.
+
+Include the LinkedIn post URL in the submission form.
+
+The organisers will share the official LinkedIn post template separately.
+
+---
+
+## Commit rule
+
+All code commits forming your Round 2 submission must be made during the authorised build phase.
+
+Once the build phase ends, do not continue making Round 2 code changes.
+
+---
+
+## Final checklist
+
+```text
+[ ] Returns Manager implementation works
+[ ] Working in my own fork
+[ ] README.md complete
+[ ] ARCHITECTURE.md complete
+[ ] Identity tested
+[ ] Completeness tested
+[ ] Condition tested
+[ ] Disposition tested
+[ ] UNCERTAIN / review handling tested
+[ ] Evidence trace implemented
+[ ] Evaluation completed
+[ ] Failure modes documented
+[ ] Demo ready
+[ ] LinkedIn post published
+[ ] CodeQuesters tagged
+[ ] Sydon.AI tagged
+[ ] Submission links verified
+[ ] Final submission ready before 1 October · 6:00 PM IST
+```
+
+> **Build → Test → Measure → Document → Publish → Submit**
+
+---
+
+**Cube Buildathon · 04 · Returns Manager**
+
+**Round 2 · Individual Build**

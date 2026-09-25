@@ -1,48 +1,513 @@
 # Rules
 
-There are two sets. The **repository rules** keep a hundred people from breaking each other's work, and GitHub enforces them. The **engineering rules** are part of what you are assessed on.
+These rules define how you should build, test and submit your **Returns Manager** for **Cube Buildathon — Round 2**.
 
-## Repository rules (enforced)
+Round 2 is an **individual build**. Your solution is assessed on both the quality of the working agent and the engineering practices behind it.
 
-| # | Rule | How it's enforced |
-|---|---|---|
-| R1 | Nobody pushes directly to `main`. | Branch protection on `main` |
-| R2 | Every change reaches `main` through a pull request. | Branch protection: PR required |
-| R3 | Only **@Cube-Buildathon** can approve and merge into `main`. | Branch protection: merge restricted to @Cube-Buildathon; CODEOWNERS review required |
-| R4 | Your branch name is your GitHub username. | `submission-guard` check, required to pass |
-| R5 | You change files **only** inside `submissions/<your-github-username>/`. | `submission-guard` check, required to pass |
-| R6 | `main` can't be force-pushed or deleted. | Branch protection |
-| R7 | No secrets in the repo: API keys, tokens, passwords, `.env` files. | You. A leaked key is revoked, and it's noted against the submission. |
-| R8 | Don't edit, delete or rename another person's branch or folder. | You. Doing so is grounds for removal from the event. |
+---
 
-The shared `data/` files and top-level docs are read-only for you. If one is wrong, open an Issue labelled `finding`.
+# 1. Round 2 Repository Rules
 
-## Engineering rules (not negotiable)
+## R1 — Individual Build
 
-These are the craft part of the assessment. Each one is cheap to follow now and expensive to retrofit.
+Round 2 is an **individual build**.
 
-### 1. Tenancy isolation before any feature
-Every table gets row-level security scoped to the organisation, **enabled and forced**. Test that a second organisation sees zero rows, and that it can't fetch another organisation's image by guessing a key. Row isolation with a shared, guessable image path is a leak that looks green.
+Each participant must independently build the **04 · Returns Manager** solution they selected.
 
-*The sample data has two orgs (`org_demo_alpha`, `org_demo_bravo`) for exactly this test.*
+Do not submit another participant's work.
 
-### 2. Batch your model calls
-Make **one** call per unit carrying all checks, never one call per check. At prep volumes that is the difference between a 90% gross margin and none.
+---
 
-### 3. Fail open
-A model error or timeout still saves the capture and still produces a record, marked `pending`. Nothing blocks the operator. Anything that makes a warehouse line wait gets worked around within a day of deployment.
+## R2 — Use Your Own Fork
 
-### 4. Uncertain is a valid verdict
-It isn't a low-confidence pass. A model that declines to judge a bad photo is more credible to an operations person than one that is confidently wrong. Build it as a first-class outcome and show it in the interface.
+Fork this official repository into your own GitHub account.
 
-*The sample data uses `uncertain` and `pending_review` as values on purpose.*
+Your fork is your Round 2 development and submission repository.
 
-### 5. Look authoritative rules up
-Where the channel publishes the requirement, retrieve it. Don't let a model recall it from memory, and don't infer it from examples. **That includes the sample CSVs in this repo.** Their requirement flags and fee amounts are dummy values.
+The intended workflow is:
 
-## Honesty rules (assessed)
+```text
+Official Repository
+        ↓
+      Fork
+        ↓
+ Your GitHub Fork
+        ↓
+ Build + Test
+        ↓
+ Commit + Push
+        ↓
+ Final Submission
+```
 
-- **Say what you built, not what it sounds like.** You have a content hash. You don't have a tamper-evident, immutable or anchored record, unless you actually built one and can show it.
-- **Overrides are data.** When an operator disagrees with the agent, capture the original verdict, the new verdict and a reason. Never discard those rows silently.
-- **"It works well" isn't a result.** Report a number per check, with false positives and false negatives separately and the method written down. An honest 61% you can break down beats a 95% you can't.
-- **Contradictions are findings.** Where the background documents disagree, raise it. Don't silently pick one side.
+---
+
+## R3 — No Shared Repository Workflow
+
+You do not need to:
+
+* create a participant branch in the organiser repository,
+* create `submissions/<your-github-username>/`,
+* open a pull request into the organiser repository,
+* wait for the organisers to merge your work.
+
+Build your complete solution inside your own fork.
+
+---
+
+## R4 — Build-Phase Commits Only
+
+All code commits that form your Round 2 submission must be made during the **authorised Round 2 build phase**.
+
+Once the build phase ends:
+
+* do not continue making Round 2 code changes,
+* do not add new implementation features,
+* do not silently replace the submitted implementation with a later version.
+
+Your submitted repository should represent work completed during the authorised build phase.
+
+---
+
+## R5 — Final Submission Deadline
+
+The final Round 2 submission deadline is:
+
+**1 October 2026 · 6:00 PM IST**
+
+The submission form closes permanently at this time.
+
+There will be **no reopening and no resubmission**.
+
+---
+
+## R6 — No Resubmission
+
+Once you submit the official submission form, your submission is **final**.
+
+You cannot replace the repository, code, demo, documentation or other submitted information after submission.
+
+Check everything before submitting.
+
+---
+
+## R7 — No Secrets
+
+Do not commit:
+
+* API keys,
+* access tokens,
+* passwords,
+* private credentials,
+* `.env` files containing secrets,
+* private keys.
+
+Use environment variables or appropriate secret-management practices.
+
+If you accidentally expose a credential, revoke it immediately.
+
+---
+
+## R8 — Do Not Damage the Official Repository
+
+Do not attempt to modify, delete or interfere with the organiser's official repository, other participants' forks, or other participants' work.
+
+Your development work should remain inside your own fork.
+
+---
+
+# 2. Engineering Rules
+
+These are part of the technical assessment.
+
+## 1. Tenancy Isolation Before Features
+
+If your implementation stores persistent data, organisation/client data must remain isolated.
+
+Test that:
+
+* a second organisation sees zero rows belonging to another organisation,
+* one organisation cannot access another organisation's images or evidence by guessing a key,
+* identifiers cannot be used to bypass tenant boundaries.
+
+The sample data contains two organisations:
+
+```text
+org_demo_alpha
+org_demo_bravo
+```
+
+Use them to test isolation.
+
+Row isolation combined with a shared, guessable image path is still a data leak.
+
+---
+
+## 2. Batch Your Model Calls
+
+Use model calls efficiently.
+
+Where multiple related checks can be safely evaluated together, avoid unnecessary repeated calls.
+
+Do not automatically create one expensive model request for every small field when a well-structured batched request can perform the related reasoning safely.
+
+Think about both:
+
+* latency,
+* cost.
+
+---
+
+## 3. Fail Open
+
+A model error, timeout or temporary dependency failure should not silently discard the capture or incoming record.
+
+The system should preserve the available information and move the case into an appropriate state such as:
+
+```text
+pending
+review
+uncertain
+```
+
+The operator should not lose the case simply because a dependency failed.
+
+---
+
+## 4. Uncertain Is a Valid Verdict
+
+`UNCERTAIN` is a first-class outcome.
+
+It is **not** a low-confidence PASS.
+
+Use it when the available evidence does not support a reliable judgment.
+
+For example:
+
+```text
+Poor / ambiguous evidence
+          ↓
+      UNCERTAIN
+          ↓
+    Human Review
+```
+
+A system that correctly refuses to make an unsupported judgment is preferable to one that confidently produces the wrong decision.
+
+The sample data intentionally includes values such as:
+
+```text
+uncertain
+pending_review
+```
+
+---
+
+## 5. Look Authoritative Rules Up
+
+Where an external channel publishes the relevant requirement, retrieve the authoritative rule.
+
+Do not rely on:
+
+* model memory,
+* assumptions,
+* synthetic examples,
+* or sample CSV values
+
+as the source of truth.
+
+The data in this repository is synthetic.
+
+Requirement flags, condition information and other sample values are provided for engineering and evaluation, not as authoritative external rules.
+
+---
+
+# 3. Returns Manager Evidence Rules
+
+## 1. Capture Decision Evidence
+
+Your agent should produce evidence that supports its decisions.
+
+A reviewer should be able to understand:
+
+```text
+Returned Item
+      ↓
+Identity Check
+      ↓
+Completeness Check
+      ↓
+Condition Check
+      ↓
+Disposition
+      ↓
+Evidence / Decision Record
+```
+
+Do not make important decisions impossible to explain.
+
+---
+
+## 2. Use the Official Evidence Contract
+
+Use the official Buildathon evidence contract as the baseline for interoperability.
+
+Relevant evidence concepts include:
+
+* `record_id`
+* `schema_version`
+* `organization_id`
+* `client_id`
+* `agent`
+* `subject`
+* `captured_at`
+* `operator_label`
+* `images`
+* `checks`
+* `outcome`
+* `overrides`
+* `status`
+* `content_hash`
+
+Where applicable, checks should include useful information such as:
+
+* `check_key`
+* `verdict`
+* `confidence`
+* `detail`
+* `model_version`
+* `latency_ms`
+
+---
+
+## 3. Overrides Are Data
+
+When an operator disagrees with an agent decision, preserve the disagreement.
+
+Where your system supports overrides, capture:
+
+* the original verdict,
+* the revised verdict,
+* the reason for the override.
+
+Do not silently replace the original decision.
+
+---
+
+# 4. Returns-Specific Decision Rules
+
+The Returns Manager should reason about four core questions:
+
+```text
+1. Is this the item that was sold?
+
+2. Is it complete?
+
+3. What condition is it in?
+
+4. What should happen to it next?
+```
+
+The implementation should support appropriate outcomes for:
+
+* identity,
+* completeness,
+* condition,
+* disposition.
+
+Use the published condition scale where required. Do not invent a different condition taxonomy and present it as the official scale.
+
+---
+
+# 5. Evaluation Rules
+
+Evaluation is part of the Round 2 assessment.
+
+Your evaluation should demonstrate whether the agent performs its required checks reliably.
+
+## Evaluate the important checks
+
+Where applicable, report performance for:
+
+* identity,
+* completeness,
+* condition,
+* disposition.
+
+Also evaluate uncertainty and review handling.
+
+---
+
+## Use Appropriate Evaluation Data
+
+Where applicable, use an unseen/held-out evaluation set rather than repeatedly tuning against the final evaluation cases.
+
+For the vision-oriented portions of the task, the recommended evaluation approach includes:
+
+* at least **50 unseen units** where applicable,
+* two independent human labels,
+* measurement of human agreement where practical,
+* varied image conditions,
+* genuinely ambiguous cases.
+
+---
+
+## Report the Results
+
+Report:
+
+* results per important check,
+* false positives,
+* false negatives,
+* `UNCERTAIN` / review rate,
+* important failure modes,
+* latency/cost where relevant.
+
+Explain how the numbers were calculated.
+
+Do not report only selected examples that make the system appear successful.
+
+---
+
+# 6. Honesty Rules
+
+## 1. Say What You Built
+
+Describe the actual implementation.
+
+For example, having a `content_hash` does not automatically mean that your records are:
+
+* tamper-evident,
+* immutable,
+* anchored,
+* or independently verifiable.
+
+Only make those claims if you actually implemented and demonstrated them.
+
+---
+
+## 2. "It Works Well" Is Not a Result
+
+Use measured results.
+
+For example:
+
+```text
+Identity
+Accuracy: 91%
+FP: 4
+FN: 5
+
+Completeness
+Accuracy: 87%
+FP: 6
+FN: 7
+```
+
+Then explain the important failure modes.
+
+An honest result that you can break down is more useful than a high number without methodology.
+
+---
+
+## 3. Contradictions Are Findings
+
+If source documents, datasets or requirements contradict one another:
+
+**raise the contradiction.**
+
+Do not silently choose whichever interpretation produces the desired result.
+
+Document what conflicts and how your implementation handles the uncertainty.
+
+---
+
+# 7. Submission Rules
+
+Your final submission should contain the required:
+
+* GitHub repository,
+* working implementation,
+* `README.md`,
+* `ARCHITECTURE.md`,
+* evaluation results,
+* demo video,
+* deployment URL where applicable,
+* LinkedIn post URL.
+
+The LinkedIn post is **mandatory** for Round 2.
+
+Your post must tag:
+
+**CodeQuesters**
+
+and
+
+**Sydon.AI**
+
+---
+
+# 8. Final Deadline
+
+## 1 October 2026 · 6:00 PM IST
+
+The official submission form closes permanently at this time.
+
+Everything required for Round 2 should be complete before the deadline.
+
+---
+
+# 9. Final Submission Policy
+
+Once you submit:
+
+**Your submission is final.**
+
+There is:
+
+* no resubmission,
+* no replacement submission,
+* no reopening of the form after the deadline.
+
+Verify your repository, demo, documentation and links before clicking Submit.
+
+---
+
+# 10. Round 2 → Round 3
+
+Round 2 is an **individual build**.
+
+Participants selected for Round 3 will work in five-person Pods combining:
+
+```text
+Receiving Manager
++
+Prep Manager
++
+Pack Manager
++
+Returns Manager
++
+Recovery Manager
+```
+
+Round 3 focuses on integrating the five specialised agents into one connected end-to-end commerce system.
+
+Your Round 2 implementation should therefore have clear outputs, evidence and interfaces that another system can understand.
+
+---
+
+# 11. Round 2 Scoring
+
+Round 2 is scored out of **100 points**.
+
+| Criterion                                    |  Points |
+| -------------------------------------------- | ------: |
+| Problem Understanding & Solution Relevance   |  **15** |
+| Agent Functionality & Decision Quality       |  **25** |
+| Evaluation, Accuracy & Uncertainty Handling  |  **25** |
+| Evidence, Traceability & Engineering Quality |  **20** |
+| UX, Demo & Documentation                     |  **15** |
+| **TOTAL**                                    | **100** |
+
+For participants who reach

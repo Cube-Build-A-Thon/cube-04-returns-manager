@@ -45,7 +45,7 @@
       "verdict": "PASS",
       "confidence_bp": 10000,
       "detail": "3 photos passed the quality gate.",
-      "model_version": "deterministic@disposition-b4ce912075c4",
+      "model_version": "deterministic@disposition-a1ff9c41a76f",
       "latency_ms": 0
     },
     {
@@ -117,7 +117,7 @@
       "verdict": "FAIL",
       "confidence_bp": 10000,
       "detail": "Not relistable as-is: damaged difficult to use, functional test required.",
-      "model_version": "deterministic@disposition-b4ce912075c4",
+      "model_version": "deterministic@disposition-a1ff9c41a76f",
       "latency_ms": 0
     },
     {
@@ -125,13 +125,13 @@
       "verdict": "PASS",
       "confidence_bp": 10000,
       "detail": "Route liquidate is allowed by amazon-uk-2020-12-electronics.",
-      "model_version": "deterministic@disposition-b4ce912075c4",
+      "model_version": "deterministic@disposition-a1ff9c41a76f",
       "latency_ms": 0
     }
   ],
   "outcome": {
     "decision": "LIQUIDATE",
-    "decided_by": "rules_engine@disposition-b4ce912075c4",
+    "decided_by": "rules_engine@disposition-a1ff9c41a76f",
     "decided_at": "2026-07-08T07:36:00Z"
   },
   "overrides": [],
@@ -268,8 +268,8 @@
         "listing_condition": null,
         "relistable_as_is": false,
         "rule_id": "R10",
-        "rules_version": "disposition-b4ce912075c4",
-        "decided_by": "rules_engine@disposition-b4ce912075c4",
+        "rules_version": "disposition-a1ff9c41a76f",
+        "decided_by": "rules_engine@disposition-a1ff9c41a76f",
         "requires_signoff": false,
         "signoff": null,
         "expected_recovery": {
@@ -305,5 +305,5 @@
       "scenario": "SYNTHETIC EXAMPLE. S07 damaged: moderate crack on the headband."
     }
   },
-  "content_hash": "sha256:a871f19d5135c91adf85984749e48f9c567a270721ae43bb9d09e1307db69af7"
+  "content_hash": "sha256:ca381f0c840b17d8cc241da6db87c83c96221a0ab918a9665bf0dea5c9d50e43"
 }

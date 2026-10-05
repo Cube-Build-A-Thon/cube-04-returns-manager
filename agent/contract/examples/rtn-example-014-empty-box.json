@@ -45,7 +45,7 @@
       "verdict": "PASS",
       "confidence_bp": 10000,
       "detail": "3 photos passed the quality gate.",
-      "model_version": "deterministic@disposition-b4ce912075c4",
+      "model_version": "deterministic@disposition-a1ff9c41a76f",
       "latency_ms": 0
     },
     {
@@ -117,7 +117,7 @@
       "verdict": "FAIL",
       "confidence_bp": 10000,
       "detail": "Not relistable as-is: functional test required.",
-      "model_version": "deterministic@disposition-b4ce912075c4",
+      "model_version": "deterministic@disposition-a1ff9c41a76f",
       "latency_ms": 0
     },
     {
@@ -125,7 +125,7 @@
       "verdict": "PASS",
       "confidence_bp": 10000,
       "detail": "Route dispose is allowed by amazon-uk-2020-12-electronics.",
-      "model_version": "deterministic@disposition-b4ce912075c4",
+      "model_version": "deterministic@disposition-a1ff9c41a76f",
       "latency_ms": 0
     }
   ],
@@ -269,7 +269,7 @@
         "listing_condition": null,
         "relistable_as_is": false,
         "rule_id": "R02",
-        "rules_version": "disposition-b4ce912075c4",
+        "rules_version": "disposition-a1ff9c41a76f",
         "decided_by": "pending",
         "requires_signoff": true,
         "signoff": {
@@ -310,5 +310,5 @@
       "scenario": "SYNTHETIC EXAMPLE. X01 empty box: primary unit not present."
     }
   },
-  "content_hash": "sha256:572046fca25b9ad89796f960589fd9b7f085b570ec0b942ff9349ec82003da1c"
+  "content_hash": "sha256:c04b1ecbafafee2d10eadfafe3717adeb57453e93c585636898e2f370cee44b7"
 }

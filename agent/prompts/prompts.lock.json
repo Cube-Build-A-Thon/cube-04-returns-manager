@@ -1,7 +1,7 @@
 {
   "judgment": {
-    "version": "1.4.0",
-    "sha256": "ff5187c08261c82c3b0f119e1d15933b3118676cb84dde1f4ba38e810eab367c"
+    "version": "1.5.0",
+    "sha256": "593be9cf9bad2dd57572b3832d2a0a9746785a45242cdb79da2ce1f0e4804cf4"
   },
   "judgment_task": {
     "version": "1.0.0",

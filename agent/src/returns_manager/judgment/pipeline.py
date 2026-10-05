@@ -11,7 +11,13 @@ from __future__ import annotations
 from dataclasses import dataclass, replace
 from typing import Literal
 
-from returns_manager.disposition.engine import DispositionDecision, DispositionInputs, MissingPart, decide
+from returns_manager.disposition.engine import (
+    DispositionDecision,
+    DispositionInputs,
+    MissingPart,
+    decide,
+    route_rule_id,
+)
 from returns_manager.judgment.claims import claim_signals
 from returns_manager.judgment.completeness import compute_completeness
 from returns_manager.judgment.consistency import apply_consistency
@@ -323,7 +329,7 @@ def build_checks(
                 "deterministic",
             )
         )
-    elif decision.rule_id in ("R07", "R08"):
+    elif route_rule_id(decision.rule_id) in ("R07", "R08"):
         checks.append(
             Check(
                 "category_policy",

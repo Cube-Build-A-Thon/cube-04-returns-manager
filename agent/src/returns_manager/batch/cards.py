@@ -145,6 +145,47 @@ def build_card(
             # (overall look; brand/model markings or shape) are enough to let a genuinely
             # matching photo pair actually confirm identity, without asserting anything more
             # specific than "matches the reference photo" for either one.
+            # Explicit physical verification: brand, colour, shape, and size.
+            DistinguishingFeature(
+                id="df_catalog_brand",
+                description=(
+                    "Brand name, manufacturer logo, model badge, or printed/embossed brand insignia on the "
+                    "product body matching between the reference (before-sale) photo and return photo. "
+                    "If the brand is unreadable or not visible from the shown angle, evaluate as "
+                    "not_visible or uncertain."
+                ),
+                location="product_body",
+                importance="critical",
+            ),
+            DistinguishingFeature(
+                id="df_catalog_color",
+                description=(
+                    "Exterior colour, chassis finish, contrast, and materials matching between the reference "
+                    "(before-sale) photo and return photo. Any conflicting colour or unverified finish must "
+                    "not be marked match."
+                ),
+                location="product_body",
+                importance="critical",
+            ),
+            DistinguishingFeature(
+                id="df_catalog_shape",
+                description=(
+                    "Physical shape, chassis silhouette, contours, curvature, aspect ratio, bezel style, "
+                    "and overall geometry matching between the reference (before-sale) photo and "
+                    "return photo."
+                ),
+                location="product_body",
+                importance="critical",
+            ),
+            DistinguishingFeature(
+                id="df_catalog_size",
+                description=(
+                    "Scale, relative proportions, port/button/vent placements, and physical dimensions "
+                    "matching between the reference (before-sale) photo and return photo."
+                ),
+                location="product_body",
+                importance="critical",
+            ),
             DistinguishingFeature(
                 id="df_catalog_appearance",
                 description=(

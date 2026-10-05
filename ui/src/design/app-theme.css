@@ -203,7 +203,7 @@
 .rm-app .identity-summary { border-radius: 12px; background: var(--success-50); border-color: var(--success-line); color: var(--success); }
 .rm-app .identity-summary b { font-size: 14px; }
 .rm-app .identity-summary small { font-size: 12px; }
-.rm-app .component-row { height: 46px; font-size: 13.5px; }
+.rm-app .component-row { min-height: 44px; height: auto !important; padding: 8px 4px; font-size: 13.5px; align-items: flex-start; }
 .rm-app .component-row > span:nth-child(2) small { font-size: 11.5px; }
 .rm-app .check-list button { min-height: 38px; }
 .rm-app .check-list button span { font-size: 13.5px; }
@@ -213,6 +213,215 @@
 .rm-app .defect > b { font-size: 13.5px; }
 .rm-app .functional, .rm-app .evidence-disclaimer, .rm-app .inspection-foot { font-size: 12.5px; }
 .rm-app .reviewer > span { background: var(--blue-50); color: var(--blue); }
+
+/* ---------- Clean Identity Checklist ---------- */
+.rm-app .identity-checklist {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  margin-top: 8px;
+  background: var(--paper);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.rm-app .id-check-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+  background: var(--paper);
+}
+.rm-app .id-check-row:last-child {
+  border-bottom: none;
+}
+.rm-app .id-check-label {
+  color: var(--text-2);
+  font-weight: 500;
+  font-size: 13px;
+}
+.rm-app .id-check-val {
+  font-weight: 600;
+  color: var(--text);
+  font-size: 13px;
+}
+.rm-app .id-confidence-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.rm-app .confidence-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 9px;
+  border-radius: 6px;
+  background: var(--blue-25);
+  border: 1px solid var(--blue-line);
+  color: var(--blue);
+  font-size: 12.5px;
+}
+.rm-app .confidence-pill b {
+  font-weight: 700;
+  font-size: 13px;
+}
+.rm-app .confidence-pill small {
+  color: var(--text-2);
+  font-size: 11px;
+}
+
+/* ---------- Feature Items (No text overlap) ---------- */
+.rm-app .feature-items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+}
+.rm-app .feature-item-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--paper);
+  min-height: auto;
+  height: auto;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+}
+.rm-app .feature-item-card.present {
+  border-left: 3px solid var(--success);
+}
+.rm-app .feature-item-card.missing {
+  border-left: 3px solid var(--danger);
+}
+.rm-app .feature-item-card.unseen {
+  border-left: 3px solid var(--warning);
+}
+.rm-app .feature-icon-col {
+  padding-top: 2px;
+  flex-shrink: 0;
+}
+.rm-app .status-bubble {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 11px;
+  font-weight: 700;
+}
+.rm-app .status-bubble.present {
+  background: var(--success-50);
+  color: var(--success);
+}
+.rm-app .status-bubble.missing {
+  background: var(--danger-50);
+  color: var(--danger);
+}
+.rm-app .status-bubble.unseen {
+  background: var(--warning-50);
+  color: var(--warning);
+}
+.rm-app .feature-body-col {
+  flex: 1;
+  min-width: 0;
+}
+.rm-app .feature-text {
+  margin: 0 0 6px 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text);
+  word-break: break-word;
+}
+.rm-app .feature-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+.rm-app .tag-importance, .rm-app .tag-location, .rm-app .tag-photo {
+  font-size: 11px;
+  padding: 2px 7px;
+  border-radius: 4px;
+  background: var(--bg-2);
+  color: var(--text-2);
+  border: 1px solid var(--border);
+}
+.rm-app .tag-importance.critical {
+  background: rgba(220, 38, 38, 0.08);
+  color: #dc2626;
+  border-color: rgba(220, 38, 38, 0.2);
+  font-weight: 600;
+}
+.rm-app .feature-result-col {
+  flex-shrink: 0;
+  padding-top: 2px;
+}
+.rm-app .result-pill {
+  display: inline-block;
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 6px;
+  text-align: center;
+}
+.rm-app .result-pill.match, .rm-app .result-pill.present {
+  background: var(--success-50);
+  color: var(--success);
+}
+.rm-app .result-pill.mismatch, .rm-app .result-pill.missing {
+  background: var(--danger-50);
+  color: var(--danger);
+}
+.rm-app .result-pill.not_visible, .rm-app .result-pill.uncertain, .rm-app .result-pill.unseen {
+  background: var(--warning-50);
+  color: var(--warning);
+}
+
+/* ---------- Components List ---------- */
+.rm-app .components-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 8px;
+}
+.rm-app .component-item-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 9px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--paper);
+  min-height: auto;
+  height: auto;
+}
+.rm-app .component-info {
+  flex: 1;
+  min-width: 0;
+}
+.rm-app .component-title {
+  display: block;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text);
+}
+.rm-app .component-photo-ref {
+  display: block;
+  font-size: 11.5px;
+  color: var(--text-2);
+  margin-top: 2px;
+}
+.rm-app .component-photo-ref a {
+  color: var(--blue);
+  text-decoration: none;
+}
+.rm-app .component-status-wrap {
+  flex-shrink: 0;
+}
 
 /* ---------- dialogs, forms, search, toast ---------- */
 .rm-app .overlay, .overlay.rm-app { background: rgba(11, 15, 25, 0.32); backdrop-filter: blur(4px); }

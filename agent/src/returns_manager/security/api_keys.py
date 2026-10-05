@@ -62,8 +62,11 @@ def parse_scopes(values: list[str] | tuple[str, ...]) -> tuple[str, ...]:
     return scopes
 
 
+_DEMO_KEYS: dict[str, ApiKeyInfo] = {}
+
+
 async def create_key(
-    db: Database,
+    db: Database | None,
     *,
     org_id: str,
     name: str,
@@ -75,6 +78,22 @@ async def create_key(
     parsed = parse_scopes(scopes)
     plaintext, prefix = generate(env)
     key_id = new_id()
+    if db is None:
+        info = ApiKeyInfo(
+            key_id=key_id,
+            org_id=org_id,
+            name=name,
+            key_prefix=prefix,
+            scopes=parsed,
+            created_by=created_by,
+            created_at=datetime.now(UTC),
+            expires_at=expires_at,
+            revoked_at=None,
+            last_used_at=None,
+        )
+        _DEMO_KEYS[key_id] = info
+        return NewApiKey(key_id, plaintext, prefix, org_id, parsed)
+
     async with db.transaction(org_id) as conn:
         await conn.execute(
             """INSERT INTO rm.api_keys
@@ -85,7 +104,9 @@ async def create_key(
     return NewApiKey(key_id, plaintext, prefix, org_id, parsed)
 
 
-async def list_keys(db: Database, org_id: str) -> list[ApiKeyInfo]:
+async def list_keys(db: Database | None, org_id: str) -> list[ApiKeyInfo]:
+    if db is None:
+        return [k for k in _DEMO_KEYS.values() if k.org_id == org_id and k.revoked_at is None]
     async with db.transaction(org_id) as conn:
         cur = await conn.execute(
             """SELECT key_id, org_id, name, key_prefix, scopes, created_by, created_at, expires_at,
@@ -96,8 +117,25 @@ async def list_keys(db: Database, org_id: str) -> list[ApiKeyInfo]:
     return [ApiKeyInfo(**{**r, "scopes": tuple(r["scopes"])}) for r in rows]
 
 
-async def revoke_key(db: Database, org_id: str, key_id: str) -> bool:
+async def revoke_key(db: Database | None, org_id: str, key_id: str) -> bool:
     """Revoke a key of this org. Returns False if no such key exists in this org (→ 404)."""
+    if db is None:
+        if key_id in _DEMO_KEYS and _DEMO_KEYS[key_id].org_id == org_id:
+            old = _DEMO_KEYS[key_id]
+            _DEMO_KEYS[key_id] = ApiKeyInfo(
+                key_id=old.key_id,
+                org_id=old.org_id,
+                name=old.name,
+                key_prefix=old.key_prefix,
+                scopes=old.scopes,
+                created_by=old.created_by,
+                created_at=old.created_at,
+                expires_at=old.expires_at,
+                revoked_at=datetime.now(UTC),
+                last_used_at=old.last_used_at,
+            )
+            return True
+        return False
     async with db.transaction(org_id) as conn:
         cur = await conn.execute(
             "UPDATE rm.api_keys SET revoked_at = coalesce(revoked_at, now()) WHERE key_id = %s", (key_id,)

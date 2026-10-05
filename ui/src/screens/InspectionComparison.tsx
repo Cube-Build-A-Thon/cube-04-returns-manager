@@ -189,23 +189,32 @@ export function InspectionComparison({
       )}
 
       <h3 className="compare-heading">Identity</h3>
-      <div className="check-list">
-        <button>
-          <span>Identity verdict (fused)</span>
-          <b>{(identity?.identity_match || 'uncertain').toUpperCase()}</b>
-        </button>
-        <button>
-          <span>Evidence strength</span>
-          <b>{titleCase(identity?.strength || 'not reported')}</b>
-        </button>
-        <button>
-          <span>Barcode</span>
-          <b>{titleCase(identity?.barcode_status || 'not read')}</b>
-        </button>
-        <button>
-          <span>Identity confidence</span>
-          <b>{confidenceText(detail.judgment?.identity?.confidence)}</b>
-        </button>
+      <div className="identity-checklist">
+        <div className="id-check-row">
+          <span className="id-check-label">Identity verdict (fused)</span>
+          <Pill value={(identity?.identity_match || 'uncertain').toUpperCase()} />
+        </div>
+        <div className="id-check-row">
+          <span className="id-check-label">Evidence strength</span>
+          <span className="id-check-val">{titleCase(identity?.strength || 'not reported')}</span>
+        </div>
+        <div className="id-check-row">
+          <span className="id-check-label">Barcode</span>
+          <span className="id-check-val">{titleCase(identity?.barcode_status || 'not read')}</span>
+        </div>
+        <div className="id-check-row">
+          <span className="id-check-label">Identity confidence</span>
+          <div className="id-confidence-badge">
+            {typeof detail.judgment?.identity?.confidence === 'number' ? (
+              <span className="confidence-pill">
+                <b>{(detail.judgment.identity.confidence * 100).toFixed(0)}%</b>
+                <small>({detail.judgment.identity.confidence.toFixed(2)} raw)</small>
+              </span>
+            ) : (
+              <span className="id-check-val">Not reported</span>
+            )}
+          </div>
+        </div>
       </div>
 
       <h3 className="compare-heading">
@@ -214,37 +223,66 @@ export function InspectionComparison({
         {counts.not_visible > 0 && ` · ${counts.not_visible} not visible`}
         {counts.not_reported > 0 && ` · ${counts.not_reported} not reported`}
       </h3>
-      {features.map((f: any, idx: number) => (
-        <div className="component-row" key={f.feature_id || idx}>
-          <span className={f.result === 'match' ? 'present' : f.result === 'mismatch' ? 'missing' : ''}>{f.importance === 'critical' ? '!' : '·'}</span>
-          <span>
-            {f.description}
-            <small>
-              {titleCase(f.importance)} · {titleCase(f.location)}
-              {f.photo ? ` · seen in ${f.photo === 'ref_before' ? 'reference' : f.photo}` : ''}
-            </small>
-          </span>
-          <b>{FEATURE_RESULT_LABEL[f.result] ?? titleCase(f.result)}</b>
-        </div>
-      ))}
+      <div className="feature-items-list">
+        {features.map((f: any, idx: number) => {
+          const isMatch = f.result === 'match'
+          const isMismatch = f.result === 'mismatch'
+          const statusClass = isMatch ? 'present' : isMismatch ? 'missing' : 'unseen'
+          const iconChar = isMatch ? '✓' : isMismatch ? '✕' : '!'
+          return (
+            <div className={`feature-item-card ${statusClass}`} key={f.feature_id || idx}>
+              <div className="feature-icon-col">
+                <span className={`status-bubble ${statusClass}`}>{iconChar}</span>
+              </div>
+              <div className="feature-body-col">
+                <p className="feature-text">{f.description}</p>
+                <div className="feature-tags">
+                  <span className={`tag-importance ${f.importance}`}>{titleCase(f.importance)}</span>
+                  <span className="tag-location">{titleCase(f.location)}</span>
+                  {f.photo && (
+                    <span className="tag-photo">
+                      seen in {f.photo === 'ref_before' ? 'reference' : f.photo}
+                    </span>
+                  )}
+                </div>
+              </div>
+              <div className="feature-result-col">
+                <span className={`result-pill ${f.result}`}>
+                  {FEATURE_RESULT_LABEL[f.result] ?? titleCase(f.result)}
+                </span>
+              </div>
+            </div>
+          )
+        })}
+      </div>
 
       <h3 className="compare-heading">Components</h3>
-      {(detail.completeness?.components ?? []).map((c) => (
-        <div className="component-row" key={c.component_id}>
-          <span className={c.status === 'present' ? 'present' : c.status === 'missing' ? 'missing' : ''}>{c.status === 'present' ? '✓' : c.status === 'missing' ? '✕' : '?'}</span>
-          <span>
-            {c.name}
-            <small>
-              {c.photos && c.photos.length > 0
-                ? c.photos.map((p) => (aliases[p] ? <a key={p} href={aliases[p]} target="_blank" rel="noreferrer">{p} </a> : <span key={p}>{p} </span>))
-                : 'no photo reference'}
-            </small>
-          </span>
-          <b>
-            {titleCase(c.status)} · {c.observed ?? '?'} / {c.expected}
-          </b>
-        </div>
-      ))}
+      <div className="components-list">
+        {(detail.completeness?.components ?? []).map((c) => {
+          const isPresent = c.status === 'present'
+          const isMissing = c.status === 'missing'
+          const statusClass = isPresent ? 'present' : isMissing ? 'missing' : 'unseen'
+          const iconChar = isPresent ? '✓' : isMissing ? '✕' : '?'
+          return (
+            <div className={`component-item-card ${statusClass}`} key={c.component_id}>
+              <span className={`status-bubble ${statusClass}`}>{iconChar}</span>
+              <div className="component-info">
+                <span className="component-title">{c.name}</span>
+                <small className="component-photo-ref">
+                  {c.photos && c.photos.length > 0
+                    ? c.photos.map((p) => (aliases[p] ? <a key={p} href={aliases[p]} target="_blank" rel="noreferrer">{p} </a> : <span key={p}>{p} </span>))
+                    : 'no photo reference'}
+                </small>
+              </div>
+              <div className="component-status-wrap">
+                <span className={`result-pill ${c.status}`}>
+                  {titleCase(c.status)} · {c.observed ?? '?'} / {c.expected}
+                </span>
+              </div>
+            </div>
+          )
+        })}
+      </div>
 
       <h3 className="compare-heading">Defects</h3>
       {defects.length === 0 ? (

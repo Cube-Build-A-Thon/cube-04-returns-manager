@@ -45,7 +45,7 @@
       "verdict": "PASS",
       "confidence_bp": 10000,
       "detail": "3 photos passed the quality gate.",
-      "model_version": "deterministic@disposition-b4ce912075c4",
+      "model_version": "deterministic@disposition-a1ff9c41a76f",
       "latency_ms": 0
     },
     {
@@ -117,7 +117,7 @@
       "verdict": "FAIL",
       "confidence_bp": 10000,
       "detail": "Not relistable as-is: functional test required.",
-      "model_version": "deterministic@disposition-b4ce912075c4",
+      "model_version": "deterministic@disposition-a1ff9c41a76f",
       "latency_ms": 0
     },
     {
@@ -125,7 +125,7 @@
       "verdict": "PASS",
       "confidence_bp": 10000,
       "detail": "Route dispose is allowed by amazon-uk-2020-12-electronics.",
-      "model_version": "deterministic@disposition-b4ce912075c4",
+      "model_version": "deterministic@disposition-a1ff9c41a76f",
       "latency_ms": 0
     }
   ],
@@ -271,7 +271,7 @@
         "listing_condition": null,
         "relistable_as_is": false,
         "rule_id": "R03",
-        "rules_version": "disposition-b4ce912075c4",
+        "rules_version": "disposition-a1ff9c41a76f",
         "decided_by": "pending",
         "requires_signoff": true,
         "signoff": {
@@ -312,5 +312,5 @@
       "scenario": "SYNTHETIC EXAMPLE. S02 wrong product returned."
     }
   },
-  "content_hash": "sha256:4b4d56a8399d2d50803601ea97dd06923e4e0cabfaac6bbcd84ec19fbe9eccfe"
+  "content_hash": "sha256:6dd929f303ee2c18df453b3ef0f76b100532bb2ed79eeb1c86157986d4d482d1"
 }

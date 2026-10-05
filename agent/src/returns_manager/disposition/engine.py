@@ -422,6 +422,12 @@ def decide(inp: DispositionInputs, rules_version: str) -> DispositionDecision:
     )
 
 
+def route_rule_id(rule_id: str) -> str:
+    """The route rule that chose the route. A provisional decision records its gate first, e.g. "R03b+R13"
+    (identity unverified, routed by R13); code that asks "which route rule fired" must use this."""
+    return rule_id.rsplit("+", 1)[-1]
+
+
 def _gate_routable(inp: DispositionInputs, rule_id: str) -> bool:
     """R03 (wrong item) is always routable; R02 only when the package is clearly empty or holds non-product
     contents. An *uncertain* unit presence is not proof of absence and gets a provisional route instead."""

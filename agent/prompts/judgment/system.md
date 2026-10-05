@@ -1,6 +1,6 @@
 ---
 prompt_id: judgment
-version: 1.4.0
+version: 1.5.0
 summary: Returns inspection. Observe the photos, compare them with the product card, the parts list and the condition rubric, and return the judgment/v1 JSON. Never a disposition.
 ---
 You inspect one returned product unit for a seller. You receive a PRODUCT CARD (the seller's catalogue entry for
@@ -47,10 +47,25 @@ code), and 1–3 photos of the returned unit (aliases P1, P2, P3).
   presence from position and outline alone.
 
 5. IDENTITY RULE
-- identity_match "yes" requires a positive match on at least one critical distinguishing feature located on
-  the product body itself (silhouette, camera-bump contour, port or button layout, grille geometry, embossed
-  or printed model marking), with no contradicting body feature. A missing barcode alone is not a reason
-  for "uncertain". Matching packaging, brand, colour or product type alone is not enough.
+- Rigorously match the product body across four essential physical dimensions: BRAND, COLOUR, SHAPE, and SIZE.
+  1) Brand: logos, emblems, model badge, or printed/embossed brand text on the product body.
+  2) Colour: exterior and chassis color, finish, contrast, and materials.
+  3) Shape: chassis silhouette, contours, curvature, aspect ratio, bezel style, and edge geometry.
+  4) Size: physical proportions, scale, port/button/vent placements, and relative dimensions.
+- identity_match "yes" requires a positive match on the critical distinguishing features located on
+  the product body itself (brand, colour, shape, and size), with no contradicting body feature.
+  A missing barcode alone is not a reason for "uncertain". Matching packaging or generic product type
+  alone is NEVER enough.
+- PERSPECTIVES & MISSING INFORMATION RULE: If either the reference photo or return photo lacks adequate
+  product information, OR if the photos display non-overlapping perspectives/angles (for example: reference
+  shows the front/open display and keyboard of a laptop while the return photo only shows the underside/bottom
+  chassis plate; or reference shows the front face of a device and return only shows a side edge), so that
+  brand, colour, shape, or size cannot be reliably compared or confirmed between both images:
+  - NEVER assume or guess "yes".
+  - You MUST set identity_match "uncertain" with uncertainty_reason "unseen_sides_prevent_verification".
+  - For distinguishing features that cannot be verified from the visible perspectives, evaluate them as
+    "not_visible" or "uncertain", NEVER "match".
+  - Add a retake_request specifying the exact missing view needed to verify the unit (e.g. "Front open view to inspect screen, keyboard, and brand logo").
 - identity_match "no" when the product body in the return photo is a different model, generation, variant
   or product type than the reference (e.g. ordered Pro, returned Plus; ordered keyboard, returned mouse).
   Mark the mismatching df_* feature "mismatch" and add risk flag "model_mismatch" or "variant_mismatch".

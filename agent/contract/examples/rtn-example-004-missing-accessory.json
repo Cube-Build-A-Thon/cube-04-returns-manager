@@ -45,7 +45,7 @@
       "verdict": "PASS",
       "confidence_bp": 10000,
       "detail": "3 photos passed the quality gate.",
-      "model_version": "deterministic@disposition-b4ce912075c4",
+      "model_version": "deterministic@disposition-a1ff9c41a76f",
       "latency_ms": 0
     },
     {
@@ -117,7 +117,7 @@
       "verdict": "FAIL",
       "confidence_bp": 10000,
       "detail": "Not relistable as-is: essential component missing, functional test required.",
-      "model_version": "deterministic@disposition-b4ce912075c4",
+      "model_version": "deterministic@disposition-a1ff9c41a76f",
       "latency_ms": 0
     },
     {
@@ -125,13 +125,13 @@
       "verdict": "PASS",
       "confidence_bp": 10000,
       "detail": "Route refurbish is allowed by amazon-uk-2020-12-electronics.",
-      "model_version": "deterministic@disposition-b4ce912075c4",
+      "model_version": "deterministic@disposition-a1ff9c41a76f",
       "latency_ms": 0
     }
   ],
   "outcome": {
     "decision": "REFURBISH",
-    "decided_by": "rules_engine@disposition-b4ce912075c4",
+    "decided_by": "rules_engine@disposition-a1ff9c41a76f",
     "decided_at": "2026-07-04T07:36:00Z"
   },
   "overrides": [],
@@ -268,8 +268,8 @@
         "listing_condition": null,
         "relistable_as_is": false,
         "rule_id": "R09",
-        "rules_version": "disposition-b4ce912075c4",
-        "decided_by": "rules_engine@disposition-b4ce912075c4",
+        "rules_version": "disposition-a1ff9c41a76f",
+        "decided_by": "rules_engine@disposition-a1ff9c41a76f",
         "requires_signoff": false,
         "signoff": null,
         "expected_recovery": {
@@ -307,5 +307,5 @@
       "scenario": "SYNTHETIC EXAMPLE. S03 one replaceable accessory missing in clear view."
     }
   },
-  "content_hash": "sha256:4ea1abdd8021ebe804ab1b318602a06cb259ca2179a5d22080f9b4f513f35280"
+  "content_hash": "sha256:1d313d60de20d3488de71c06ed9d95d58112df1b8cfa88e91c2d2f43e4f844d6"
 }

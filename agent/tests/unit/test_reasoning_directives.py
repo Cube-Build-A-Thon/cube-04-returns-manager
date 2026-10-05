@@ -185,3 +185,46 @@ def test_structural_damage_blocks_listing_and_cosmetic_wear_does_not(
         b.judgment(ctx), lambda d: d["condition"].update(observations=[b.defect(defect_type, severity)])
     )
     assert ("damaged_difficult_to_use" in b.run(ctx, j).condition.listing_blockers) is blocks
+
+
+# ── Provisional decisions carry a compound rule id ("R03b+R13"): consumers use the route rule ──────
+
+
+def test_route_rule_id_reads_the_deciding_rule_of_a_provisional_decision() -> None:
+    from returns_manager.disposition.engine import route_rule_id
+
+    assert route_rule_id("R03b+R13") == "R13"
+    assert route_rule_id("R05b+R11") == "R11"
+    assert route_rule_id("R10") == "R10"
+
+
+def test_price_driven_provisional_outcome_is_marked_value_driven() -> None:
+    from types import SimpleNamespace
+
+    from returns_manager.batch.io_csv import BeforeRow
+    from returns_manager.batch.runner import value_record
+
+    before = BeforeRow(
+        "PCK-1", "U-1", "org_demo_alpha", "O-1", "SKU-1", "", "yes", "phone", "", "http://x/a.jpg"
+    )
+    for rule in ("R05b+R11", "R03b+R10", "R09b", "R07"):
+        decision = SimpleNamespace(rule_id=rule, signoff_reasons=())
+        assert value_record(before, 999900, decision)["value_driven_outcomes"] == [rule], rule
+    assert (
+        value_record(before, 999900, SimpleNamespace(rule_id="R03b+R13", signoff_reasons=()))[
+            "value_driven_outcomes"
+        ]
+        == []
+    )
+
+
+def test_category_policy_check_fails_for_a_provisional_policy_route() -> None:
+    from returns_manager.judgment.pipeline import PhotoGate, build_checks
+
+    ctx = b.context(LAMP)
+    r = b.run(ctx, b.judgment(ctx))
+    provisional = dataclasses.replace(r.decision, rule_id="R03b+R08", recommended_disposition="dispose")
+    checks = build_checks(
+        ctx, PhotoGate(3, False), r.presence, r.identity, r.completeness, r.condition, provisional
+    )
+    assert next(c for c in checks if c.check_key == "category_policy").verdict == "FAIL"

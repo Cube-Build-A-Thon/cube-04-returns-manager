@@ -46,6 +46,10 @@ async def get_return_evidence(
     Returns 404 when no record exists or the unit belongs to another org.
     """
     require(principal, Permission.EVIDENCE_READ)
+    if svc.db is None:
+        from returns_manager.errors import NotFound
+
+        raise NotFound(f"No evidence record for unit {unit_id!r}")
     doc = await get_evidence_document(
         svc.db.pool,
         org_id=principal.org_id,

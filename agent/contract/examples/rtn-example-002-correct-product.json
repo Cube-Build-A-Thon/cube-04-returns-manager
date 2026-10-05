@@ -45,7 +45,7 @@
       "verdict": "PASS",
       "confidence_bp": 10000,
       "detail": "3 photos passed the quality gate.",
-      "model_version": "deterministic@disposition-b4ce912075c4",
+      "model_version": "deterministic@disposition-a1ff9c41a76f",
       "latency_ms": 0
     },
     {
@@ -117,7 +117,7 @@
       "verdict": "PASS",
       "confidence_bp": 10000,
       "detail": "No listing blockers observed in the provided photos.",
-      "model_version": "deterministic@disposition-b4ce912075c4",
+      "model_version": "deterministic@disposition-a1ff9c41a76f",
       "latency_ms": 0
     },
     {
@@ -125,13 +125,13 @@
       "verdict": "PASS",
       "confidence_bp": 10000,
       "detail": "Route restock is allowed by amazon-uk-2020-12-electronics.",
-      "model_version": "deterministic@disposition-b4ce912075c4",
+      "model_version": "deterministic@disposition-a1ff9c41a76f",
       "latency_ms": 0
     }
   ],
   "outcome": {
     "decision": "RESTOCK",
-    "decided_by": "rules_engine@disposition-b4ce912075c4",
+    "decided_by": "rules_engine@disposition-a1ff9c41a76f",
     "decided_at": "2026-07-02T07:36:00Z"
   },
   "overrides": [],
@@ -265,8 +265,8 @@
         "listing_condition": "new",
         "relistable_as_is": true,
         "rule_id": "R12",
-        "rules_version": "disposition-b4ce912075c4",
-        "decided_by": "rules_engine@disposition-b4ce912075c4",
+        "rules_version": "disposition-a1ff9c41a76f",
+        "decided_by": "rules_engine@disposition-a1ff9c41a76f",
         "requires_signoff": false,
         "signoff": null,
         "expected_recovery": {
@@ -302,5 +302,5 @@
       "scenario": "SYNTHETIC EXAMPLE. S01 correct product, factory sealed."
     }
   },
-  "content_hash": "sha256:7a02fff3ed263d39cd37daff11a0acb4fbb9983782e411a1323f16a61276b5eb"
+  "content_hash": "sha256:d51e2ccc78f1e0438196eaf6db219d95582f27545aeb81d49c14a78b796b2ecd"
 }

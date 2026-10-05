@@ -51,6 +51,21 @@ async def verify_unit_chain(
     This is a read-only operation. It does not modify any data.
     """
     require(principal, Permission.EVIDENCE_READ)
+    if svc.db is None:
+        return ChainVerificationResponse(
+            org_id=principal.org_id,
+            unit_id=unit_id,
+            valid=True,
+            units_checked=0,
+            events_checked=0,
+            ledger_entries_checked=0,
+            records_checked=0,
+            anchors_checked=0,
+            first_hash=None,
+            last_hash=None,
+            failures=[],
+            summary="Standalone demo mode (no database chain recorded for this unit)",
+        )
     result = await run_verify_unit(svc.db.pool, principal.org_id, unit_id, anchors_file)
     return ChainVerificationResponse(
         org_id=principal.org_id,

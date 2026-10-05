@@ -45,7 +45,7 @@
       "verdict": "PASS",
       "confidence_bp": 10000,
       "detail": "3 photos passed the quality gate.",
-      "model_version": "deterministic@disposition-b4ce912075c4",
+      "model_version": "deterministic@disposition-a1ff9c41a76f",
       "latency_ms": 0
     },
     {
@@ -117,7 +117,7 @@
       "verdict": "FAIL",
       "confidence_bp": 10000,
       "detail": "Not relistable as-is: functional test required.",
-      "model_version": "deterministic@disposition-b4ce912075c4",
+      "model_version": "deterministic@disposition-a1ff9c41a76f",
       "latency_ms": 0
     },
     {
@@ -125,13 +125,13 @@
       "verdict": "PASS",
       "confidence_bp": 10000,
       "detail": "Route refurbish is allowed by amazon-uk-2020-12-electronics.",
-      "model_version": "deterministic@disposition-b4ce912075c4",
+      "model_version": "deterministic@disposition-a1ff9c41a76f",
       "latency_ms": 0
     }
   ],
   "outcome": {
     "decision": "REFURBISH",
-    "decided_by": "rules_engine@disposition-b4ce912075c4",
+    "decided_by": "rules_engine@disposition-a1ff9c41a76f",
     "decided_at": "2026-07-06T07:36:00Z"
   },
   "overrides": [],
@@ -267,8 +267,8 @@
         "listing_condition": null,
         "relistable_as_is": false,
         "rule_id": "R11",
-        "rules_version": "disposition-b4ce912075c4",
-        "decided_by": "rules_engine@disposition-b4ce912075c4",
+        "rules_version": "disposition-a1ff9c41a76f",
+        "decided_by": "rules_engine@disposition-a1ff9c41a76f",
         "requires_signoff": false,
         "signoff": null,
         "expected_recovery": {
@@ -304,5 +304,5 @@
       "scenario": "SYNTHETIC EXAMPLE. S05 new-looking return, opened box, no wear."
     }
   },
-  "content_hash": "sha256:05c0a58921bd4bcb28d3fde2e8743f28caa3d762f78cb373963efaf94281b87b"
+  "content_hash": "sha256:bc9049437c063109b57795c3b674af7281b331a51ba19326ca6ae45a7575f41a"
 }

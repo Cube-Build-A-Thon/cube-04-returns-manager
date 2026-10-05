@@ -52,7 +52,12 @@ class ReasonRequired(ValueError):
     pass
 
 
-async def _rows(db: Database, org_id: str | None) -> list[ControlRow]:
+_DEMO_CONTROLS: dict[tuple[str, Control], ControlRow] = {}
+
+
+async def _rows(db: Database | None, org_id: str | None) -> list[ControlRow]:
+    if db is None:
+        return [r for (scope, _), r in _DEMO_CONTROLS.items() if scope in (GLOBAL, org_id)]
     async with db.transaction(org_id) as conn:
         cur = await conn.execute(
             "SELECT scope, control, enabled, reason, updated_by, updated_at FROM rm.system_controls"
@@ -61,7 +66,7 @@ async def _rows(db: Database, org_id: str | None) -> list[ControlRow]:
     return [ControlRow(**{**r, "control": Control(r["control"])}) for r in rows]
 
 
-async def effective(db: Database, org_id: str) -> dict[Control, EffectiveControl]:
+async def effective(db: Database | None, org_id: str) -> dict[Control, EffectiveControl]:
     rows = await _rows(db, org_id)
     out: dict[Control, EffectiveControl] = {}
     for control in Control:
@@ -72,15 +77,32 @@ async def effective(db: Database, org_id: str) -> dict[Control, EffectiveControl
     return out
 
 
-async def global_rows(db: Database) -> list[ControlRow]:
+async def global_rows(db: Database | None) -> list[ControlRow]:
     return [r for r in await _rows(db, None) if r.scope == GLOBAL]
 
 
 async def _upsert(
-    db: Database, tx_org: str | None, scope: str, control: Control, enabled: bool, reason: str, actor: str
+    db: Database | None,
+    tx_org: str | None,
+    scope: str,
+    control: Control,
+    enabled: bool,
+    reason: str,
+    actor: str,
 ) -> ControlRow:
     if not reason or not reason.strip():
         raise ReasonRequired("a reason is required to change a control")
+    if db is None:
+        row = ControlRow(
+            scope=scope,
+            control=control,
+            enabled=enabled,
+            reason=reason.strip(),
+            updated_by=actor,
+            updated_at=datetime.now(),
+        )
+        _DEMO_CONTROLS[(scope, control)] = row
+        return row
     async with db.transaction(tx_org) as conn:
         cur = await conn.execute(
             """INSERT INTO rm.system_controls (scope, control, enabled, reason, updated_by, updated_at)
@@ -97,7 +119,7 @@ async def _upsert(
 
 
 async def set_org_control(
-    db: Database, principal: Principal, control: Control, enabled: bool, reason: str
+    db: Database | None, principal: Principal, control: Control, enabled: bool, reason: str
 ) -> ControlRow:
     """An org admin changes a control for their own org only."""
     require(principal, Permission.ADMIN)
@@ -107,7 +129,7 @@ async def set_org_control(
 
 
 async def set_global_control(
-    db: Database, control: Control, enabled: bool, reason: str, actor: str
+    db: Database | None, control: Control, enabled: bool, reason: str, actor: str
 ) -> ControlRow:
     """CLI only: a transaction without tenant context (the only context in which RLS allows global writes)."""
     return await _upsert(db, None, GLOBAL, control, enabled, reason, actor)

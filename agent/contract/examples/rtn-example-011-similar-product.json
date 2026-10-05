@@ -45,7 +45,7 @@
       "verdict": "PASS",
       "confidence_bp": 10000,
       "detail": "3 photos passed the quality gate.",
-      "model_version": "deterministic@disposition-b4ce912075c4",
+      "model_version": "deterministic@disposition-a1ff9c41a76f",
       "latency_ms": 0
     },
     {
@@ -117,7 +117,7 @@
       "verdict": "FAIL",
       "confidence_bp": 10000,
       "detail": "Not relistable as-is: functional test required.",
-      "model_version": "deterministic@disposition-b4ce912075c4",
+      "model_version": "deterministic@disposition-a1ff9c41a76f",
       "latency_ms": 0
     },
     {
@@ -125,7 +125,7 @@
       "verdict": "PASS",
       "confidence_bp": 10000,
       "detail": "Route refurbish is allowed by amazon-uk-2020-12-electronics.",
-      "model_version": "deterministic@disposition-b4ce912075c4",
+      "model_version": "deterministic@disposition-a1ff9c41a76f",
       "latency_ms": 0
     }
   ],
@@ -271,7 +271,7 @@
         "listing_condition": null,
         "relistable_as_is": false,
         "rule_id": "R03b+R11",
-        "rules_version": "disposition-b4ce912075c4",
+        "rules_version": "disposition-a1ff9c41a76f",
         "decided_by": "pending",
         "requires_signoff": false,
         "signoff": null,
@@ -308,5 +308,5 @@
       "scenario": "SYNTHETIC EXAMPLE. S10 a similar-looking product: identity not verified."
     }
   },
-  "content_hash": "sha256:f491e868b039a0ee4f76029ed5dcb1ac6ea478d2c9d8fafda1a2511193157516"
+  "content_hash": "sha256:c36bdaba090d0d017d04c156eeda5145cefb2830945e7c2adc95b2d8d242bb39"
 }

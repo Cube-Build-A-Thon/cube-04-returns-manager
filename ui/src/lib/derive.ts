@@ -353,3 +353,55 @@ export function distinctSkus(rows: DerivedRow[]): { sku: string; asin: string; i
   }
   return [...bySku.values()].sort((a, b) => b.count - a.count)
 }
+
+export function getDetailedDispositionExplanation(
+  row: DerivedRow | BatchRowFlat,
+  _detail: RowDetail | null,
+  reasoning: ProductReasoning,
+): string {
+  const disp = reasoning.disposition.toLowerCase()
+  const photoIdentity = (row.photo_identity_match || '').toLowerCase()
+  const isIdentityUncertain = photoIdentity === 'uncertain' || row.identity_match === 'uncertain'
+  const hasReturnPhoto = Boolean(
+    (row as DerivedRow).image || (row.photo_refs && row.photo_refs.trim().length > 0)
+  )
+  const isReturnPhotoMissing = !hasReturnPhoto || row.failure_reason === 'no_return_photo'
+  const rationale = (row.rationale || '').trim()
+
+  if (isReturnPhotoMissing) {
+    return 'No return photograph was supplied in the intake submission. Visual identity and cosmetic condition cannot be verified against the catalog baseline, placing this item into Uncertain / Pending Review.'
+  }
+
+  if (isIdentityUncertain || disp === '—') {
+    return 'Placed in Uncertain / Pending Review because product identity or condition cannot be confirmed with high confidence. The before-sale catalog reference image and the returned item photograph lack sufficient overlapping visual information (for example, non-overlapping perspectives such as an open front screen/keyboard vs. an underside chassis panel, preventing direct verification of brand, colour, shape, and size). An operator must inspect the physical unit or request additional photos from matching perspectives.'
+  }
+
+  if (disp === 'refurbish') {
+    let text = 'Assigned to Refurbish: Under marketplace safety standards (Rule R11), opened electrical and computing devices require certified technical bench testing and safety checks before restocking, regardless of pristine cosmetic appearance.'
+    if (rationale.includes('net gain') || rationale.includes('R11')) {
+      text += ' The rules engine confirmed that testing and cosmetic repackaging yield positive economic recovery value.'
+    }
+    return text
+  }
+
+  if (disp === 'restock') {
+    return 'Assigned to Restock: The returned unit matches the catalog specifications in brand, colour, shape, and size, shows no defects or usage signs, all expected components are verified present, and no mandatory testing blockers apply.'
+  }
+
+  if (disp === 'liquidate') {
+    return 'Assigned to Liquidate: Minor cosmetic wear, signs of use, or missing non-essential parts reduce recovery value below the restock standard, but secondary market recovery exceeds disposal salvage.'
+  }
+
+  if (disp === 'dispose') {
+    if (row.photo_identity_match === 'no' || (row as DerivedRow).wrong_item_flag) {
+      return 'Assigned to Dispose: Confirmed product mismatch or product swap (Rule R03: Wrong item returned). The unit in the return photo does not match the sold SKU.'
+    }
+    return 'Assigned to Dispose: The item has sustained severe structural damage, missing essential components, or hazard risks making refurbishment economically or safely unviable.'
+  }
+
+  if (rationale) {
+    return rationale
+  }
+
+  return 'Intake evidence requires operator inspection to establish product identity, physical condition, and routing.'
+}

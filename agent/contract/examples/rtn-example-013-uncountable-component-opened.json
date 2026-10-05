@@ -45,7 +45,7 @@
       "verdict": "PASS",
       "confidence_bp": 10000,
       "detail": "3 photos passed the quality gate.",
-      "model_version": "deterministic@disposition-b4ce912075c4",
+      "model_version": "deterministic@disposition-a1ff9c41a76f",
       "latency_ms": 0
     },
     {
@@ -117,7 +117,7 @@
       "verdict": "FAIL",
       "confidence_bp": 10000,
       "detail": "Not relistable as-is: functional test required.",
-      "model_version": "deterministic@disposition-b4ce912075c4",
+      "model_version": "deterministic@disposition-a1ff9c41a76f",
       "latency_ms": 0
     },
     {
@@ -125,7 +125,7 @@
       "verdict": "PASS",
       "confidence_bp": 10000,
       "detail": "Route refurbish is allowed by amazon-uk-2020-12-electronics.",
-      "model_version": "deterministic@disposition-b4ce912075c4",
+      "model_version": "deterministic@disposition-a1ff9c41a76f",
       "latency_ms": 0
     }
   ],
@@ -271,7 +271,7 @@
         "listing_condition": null,
         "relistable_as_is": false,
         "rule_id": "R11",
-        "rules_version": "disposition-b4ce912075c4",
+        "rules_version": "disposition-a1ff9c41a76f",
         "decided_by": "pending",
         "requires_signoff": false,
         "signoff": null,
@@ -310,5 +310,5 @@
       "scenario": "SYNTHETIC EXAMPLE. X07 a part that photos cannot verify, packaging opened."
     }
   },
-  "content_hash": "sha256:f512311672f8f4d3dcdc6d84b26d1e76e4454c66f94f710ad8c14069d05ba253"
+  "content_hash": "sha256:77ccd39573838f8ba4cbc89a407077198313a574a604a8e69f0536398372c2ef"
 }

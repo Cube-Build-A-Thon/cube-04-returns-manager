@@ -66,6 +66,28 @@ async def get_metrics_summary(
 ) -> MetricsSummaryResponse:
     require(principal, Permission.METRICS_READ)
     window = _validated_window(window)
+    if svc.db is None:
+        empty = MetricEnvelope(value="no data", n=0, window=window, method="standalone demo mode")
+        keys = [
+            "throughput_per_hour",
+            "model_latency_ms",
+            "queue_wait_ms",
+            "capture_to_decision_ms",
+            "requests_per_inspection",
+            "tool_calls_per_inspection",
+            "tokens_per_inspection",
+            "uncertain_rate",
+            "retake_rate",
+            "escalation_rate",
+            "audit_disagreement_rate",
+            "override_rate",
+            "signoff_approval_rate",
+            "needs_attention_rate",
+            "error_rate_by_class",
+            "disposition_distribution",
+            "integrity_counters",
+        ]
+        return MetricsSummaryResponse(window=window, metrics={k: empty for k in keys})
     async with svc.db.transaction(principal.org_id) as conn:
         service = MetricsService(conn, principal.org_id)
         summary = await service.summary(window)
@@ -85,6 +107,16 @@ async def get_metrics_economics(
 ) -> EconomicsReportResponse:
     require(principal, Permission.METRICS_READ)
     window = _validated_window(window)
+    if svc.db is None:
+        empty = MetricEnvelope(value="no data", n=0, window=window, method="standalone demo mode")
+        return EconomicsReportResponse(
+            window=window,
+            volume=volume,
+            cost_by_stage={},
+            cost_per_inspection=empty,
+            projected_monthly_cost=empty,
+            recovery_uplift=empty,
+        )
     async with svc.db.transaction(principal.org_id) as conn:
         service = EconomicsService(conn, principal.org_id, svc.settings)
         report = await service.report(window, volume)  # already carries "window"

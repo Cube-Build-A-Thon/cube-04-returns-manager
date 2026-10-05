@@ -41,6 +41,7 @@ from returns_manager.batch.parts import parse_parts_list
 from returns_manager.canonical.hashing import sha256_hex
 from returns_manager.config import REPO_ROOT, Settings
 from returns_manager.db.pool import Database
+from returns_manager.disposition.engine import route_rule_id
 from returns_manager.errors import QuotaExhaustedError
 from returns_manager.jobs.budget import TokenBucketRateLimiter
 from returns_manager.jobs.retry import classify_error
@@ -287,7 +288,8 @@ def check_id_match(before: BeforeRow | None, row: ReturnedRow) -> str:
 
 # Engine outcomes that depend on the list price: S02 (high-value sign-off), R09 (refurbish only
 # if the net gain clears the threshold) and R10 (liquidate vs dispose by salvage value).
-VALUE_DRIVEN_RULES = ("R09", "R10")
+# R07/R10 liquidate-vs-dispose (salvage), R09/R09b/R11 refurbish-vs-other (net gain) all use the price.
+VALUE_DRIVEN_RULES = ("R07", "R09", "R09b", "R10", "R11")
 VALUE_DRIVEN_SIGNOFFS = ("S02_high_value",)
 
 
@@ -305,7 +307,7 @@ def value_record(before: BeforeRow, default_minor: int, decision: Any) -> dict[s
     """Where the numbers behind a value-driven outcome came from, for the row detail. The UI shows
     "price assumed (synthetic)" from `value_source`; it never works this out itself. Recovery
     rates and refurbish cost are always the synthetic placeholders in batch/cards.py."""
-    outcomes = [decision.rule_id] if decision.rule_id in VALUE_DRIVEN_RULES else []
+    outcomes = [decision.rule_id] if route_rule_id(decision.rule_id) in VALUE_DRIVEN_RULES else []
     outcomes += [s for s in decision.signoff_reasons if s in VALUE_DRIVEN_SIGNOFFS]
     return {
         "list_price_minor": _list_price(before, default_minor),

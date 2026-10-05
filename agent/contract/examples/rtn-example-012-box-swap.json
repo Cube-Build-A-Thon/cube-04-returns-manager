@@ -45,7 +45,7 @@
       "verdict": "PASS",
       "confidence_bp": 10000,
       "detail": "3 photos passed the quality gate.",
-      "model_version": "deterministic@disposition-b4ce912075c4",
+      "model_version": "deterministic@disposition-a1ff9c41a76f",
       "latency_ms": 0
     },
     {
@@ -117,7 +117,7 @@
       "verdict": "FAIL",
       "confidence_bp": 10000,
       "detail": "Not relistable as-is: functional test required.",
-      "model_version": "deterministic@disposition-b4ce912075c4",
+      "model_version": "deterministic@disposition-a1ff9c41a76f",
       "latency_ms": 0
     },
     {
@@ -125,7 +125,7 @@
       "verdict": "PASS",
       "confidence_bp": 10000,
       "detail": "Route dispose is allowed by amazon-uk-2020-12-electronics.",
-      "model_version": "deterministic@disposition-b4ce912075c4",
+      "model_version": "deterministic@disposition-a1ff9c41a76f",
       "latency_ms": 0
     }
   ],
@@ -272,7 +272,7 @@
         "listing_condition": null,
         "relistable_as_is": false,
         "rule_id": "R03",
-        "rules_version": "disposition-b4ce912075c4",
+        "rules_version": "disposition-a1ff9c41a76f",
         "decided_by": "pending",
         "requires_signoff": true,
         "signoff": {
@@ -313,5 +313,5 @@
       "scenario": "SYNTHETIC EXAMPLE. X06 box swap: packaging barcode matches, product body does not."
     }
   },
-  "content_hash": "sha256:12df8d1d7bb096df3e82d914b31269cd5aa42dfa9a3f2fac10571ae47c07ca24"
+  "content_hash": "sha256:2c75f6a4293ad0f3474d1cd90a2426c9fd09c1a3690a3b6222c5e87e08eefdf5"
 }

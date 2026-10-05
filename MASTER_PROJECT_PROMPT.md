@@ -174,9 +174,9 @@ Sign-off rules are added on top of the route. The table is produced by `python s
 | R14 | 3 route | liquidate | `grade is not None and grade != 'new' and (grade not in inp.restock_used_grades)` | `f'used grade {grade} is outside restock_used_grades (business policy)'` | 250 |
 | R99 | 3 route | no recommendation (review required) | `always (fallthrough)` | `rule_gap` | 254 |
 | S03 | sign-off | route stands; human sign-off required | `gate is not None and gate[0] in ('R02', 'R03') and _gate_routable(inp, gate[0]) and inp.escalation_disagreement_resolved_by_reviewer` | `S03_escalation_disagreement_resolved` | 330 |
-| S01 | sign-off | route stands; human sign-off required | `route == 'dispose'` | `S01_dispose_always` | 434 |
-| S02 | sign-off | route stands; human sign-off required | `route not in (None, 'restock') and inp.list_price_minor >= inp.high_value_threshold_minor` | `S02_high_value` | 436 |
-| S03 | sign-off | route stands; human sign-off required | `inp.escalation_disagreement_resolved_by_reviewer` | `S03_escalation_disagreement_resolved` | 438 |
+| S01 | sign-off | route stands; human sign-off required | `route == 'dispose'` | `S01_dispose_always` | 440 |
+| S02 | sign-off | route stands; human sign-off required | `route not in (None, 'restock') and inp.list_price_minor >= inp.high_value_threshold_minor` | `S02_high_value` | 442 |
+| S03 | sign-off | route stands; human sign-off required | `inp.escalation_disagreement_resolved_by_reviewer` | `S03_escalation_disagreement_resolved` | 444 |
 <!-- rule-table:end -->
 
 S02's threshold is `RM_HIGH_VALUE_THRESHOLD_MINOR`, default 500000 paise (₹5,000). In the batch tool, a

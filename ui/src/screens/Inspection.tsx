@@ -26,7 +26,7 @@ import {
 import { ApiError } from '../lib/api'
 import { useBatchStore } from '../lib/store'
 import { moneyMinor, titleCase } from '../lib/format'
-import { deriveProductReasoning, dispositionLabel, idCheckLabel } from '../lib/derive'
+import { deriveProductReasoning, dispositionLabel, idCheckLabel, getDetailedDispositionExplanation } from '../lib/derive'
 import type { DecisionAction, RowDetail } from '../lib/types'
 import { Pill } from './shared'
 import { InspectionComparison } from './InspectionComparison'
@@ -199,6 +199,30 @@ export default function Inspection() {
   // From the backend's value record only: the CSV gave no list price, so the default was used.
   const priceAssumed = detail?.value?.value_source === 'synthetic_default'
   const reasoning = deriveProductReasoning(row, detail)
+
+  // Catalog and photograph component reconciliation:
+  // By domain convention (and batch/parts.py), index 0 is the root product unit depicted in the catalog photo.
+  // Subsequent parts are packaged accessories not depicted in before-sale reference photos.
+  const allParts = (row.parts_list || '').split(';').map((p) => p.trim()).filter(Boolean)
+  const missingParts = (row.parts_missing || '').split(';').map((p) => p.trim()).filter(Boolean)
+
+  // Confirmed present accessories from detailed inspection
+  const confirmedPresentSet = new Set(
+    (detail?.completeness?.components || [])
+      .filter((c) => c.status === 'present')
+      .map((c) => c.name.trim())
+  )
+
+  // Accessories not depicted in before-sale photo and not confirmed present in photos
+  const unobservedAccessories = allParts.slice(1).filter(
+    (p) => !confirmedPresentSet.has(p) && !missingParts.includes(p)
+  )
+
+  // Photo-verified components: root main unit (depicted in catalog photo) plus any accessory
+  // confirmed present or confirmed missing
+  const photoVerifiedParts = allParts.filter(
+    (p, idx) => idx === 0 || confirmedPresentSet.has(p) || missingParts.includes(p)
+  )
 
   return (
     <>
@@ -678,25 +702,53 @@ export default function Inspection() {
                     <small className="kicker">PACKAGE CONTENTS</small>
                     <h2>Expected components</h2>
                   </div>
-                  <Pill value={row.parts_missing ? 'Incomplete' : 'Complete'} />
+                  <Pill value={missingParts.length > 0 ? 'Incomplete' : unobservedAccessories.length > 0 ? 'Verified (Main unit)' : 'Complete'} />
                 </div>
-                {row.parts_list ? (
-                  row.parts_list.split(';').map((p) => {
-                    const isMissing = (row.parts_missing || '').includes(p.trim())
+                {photoVerifiedParts.length > 0 ? (
+                  photoVerifiedParts.map((p) => {
+                    const isMissing = missingParts.includes(p)
                     return (
                       <div className="component-row" key={p}>
                         <span className={isMissing ? 'missing' : 'present'}>
                           {isMissing ? <X size={12} /> : <Check size={12} />}
                         </span>
-                        <span>{p.trim()}</span>
+                        <span>{p}</span>
                         <b>{isMissing ? 'Missing' : 'Present'}</b>
+                      </div>
+                    )
+                  })
+                ) : allParts.length > 0 ? (
+                  allParts.map((p) => {
+                    const isMissing = missingParts.includes(p)
+                    const isUnobserved = unobservedAccessories.includes(p)
+                    return (
+                      <div className="component-row" key={p}>
+                        <span className={isMissing ? 'missing' : isUnobserved ? '' : 'present'}>
+                          {isMissing ? <X size={12} /> : isUnobserved ? <CircleAlert size={12} /> : <Check size={12} />}
+                        </span>
+                        <span>{p}</span>
+                        <b>{isMissing ? 'Missing' : isUnobserved ? 'Not visible in photos' : 'Present'}</b>
                       </div>
                     )
                   })
                 ) : (
                   <div className="functional"><LockKeyhole size={14} /> No catalog parts list specified</div>
                 )}
-              </section>              <section className="panel finding-panel">
+                {unobservedAccessories.length > 0 && (
+                  <div style={{ marginTop: '10px', padding: '9px 12px', background: 'var(--canvas)', border: '1px solid var(--line)', borderRadius: '6px', fontSize: '11.5px', color: 'var(--muted)', display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
+                    <Info size={14} style={{ color: '#d97706', flexShrink: 0, marginTop: '2px' }} />
+                    <div>
+                      <b style={{ color: 'var(--ink)' }}>Accessories not visible in photos:</b>{' '}
+                      <span>{unobservedAccessories.join(', ')}</span>
+                      <div style={{ marginTop: '2px', fontSize: '11px', color: 'var(--muted)' }}>
+                        Not depicted in before-sale reference photo (out of frame; not evaluated as present).
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </section>
+
+              <section className="panel finding-panel">
                 <div className="panel-head">
                   <div>
                     <small className="kicker">PHYSICAL CONDITION</small>
@@ -710,6 +762,31 @@ export default function Inspection() {
                     {reasoning.shortConditionReason}
                     <small>{reasoning.conditionReason}</small>
                   </b>
+                </div>
+
+                <div style={{
+                  marginTop: '12px',
+                  padding: '12px 14px',
+                  background: 'var(--canvas)',
+                  border: '1px solid var(--line)',
+                  borderRadius: '8px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '8px'
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 600, fontSize: '12.5px', color: 'var(--ink)' }}>
+                      <Sparkles size={14} style={{ color: '#0f3ea2' }} />
+                      Condition Assessment &amp; Disposition Rationale
+                    </span>
+                    <Pill value={reasoning.disposition === '—' ? 'UNCERTAIN' : reasoning.disposition.toUpperCase()} />
+                  </div>
+                  <div style={{ fontSize: '12px', lineHeight: '1.5', color: 'var(--ink)' }}>
+                    <b>Assessment:</b> {reasoning.conditionReason}
+                  </div>
+                  <div style={{ fontSize: '12px', lineHeight: '1.5', color: 'var(--muted)' }}>
+                    <b>Why this disposition:</b> {getDetailedDispositionExplanation(row, detail, reasoning)}
+                  </div>
                 </div>
               </section>
             </>
@@ -758,12 +835,12 @@ export default function Inspection() {
                   <div>
                     <small className="kicker">PACKAGE CONTENTS</small>
                     <h2>
-                      {(detail.completeness?.components || []).filter((c) => c.status === 'present').length} of {(detail.completeness?.components || []).length} components found
+                      {(detail.completeness?.components || []).filter((c) => c.status === 'present').length} of {(detail.completeness?.components || []).filter((c) => c.status !== 'uncertain').length || 1} photo-verified components found
                     </h2>
                   </div>
-                  <Pill value={titleCase(detail.completeness?.status || (row.parts_missing ? 'incomplete' : 'complete'))} />
+                  <Pill value={titleCase(detail.completeness?.status || (missingParts.length > 0 ? 'incomplete' : unobservedAccessories.length > 0 ? 'partial' : 'complete'))} />
                 </div>
-                {(detail.completeness?.components || []).map((c) => (
+                {(detail.completeness?.components || []).filter((c) => c.status !== 'uncertain').map((c) => (
                   <div className="component-row" key={c.component_id}>
                     <span className={c.status === 'present' ? 'present' : c.status === 'missing' ? 'missing' : ''}>
                       {c.status === 'present' ? <Check size={12} /> : c.status === 'missing' ? <X size={12} /> : <CircleAlert size={12} />}
@@ -777,6 +854,18 @@ export default function Inspection() {
                     </b>
                   </div>
                 ))}
+                {(detail.completeness?.components || []).filter((c) => c.status === 'uncertain').length > 0 && (
+                  <div style={{ marginTop: '10px', padding: '9px 12px', background: 'var(--canvas)', border: '1px solid var(--line)', borderRadius: '6px', fontSize: '11.5px', color: 'var(--muted)', display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
+                    <Info size={14} style={{ color: '#d97706', flexShrink: 0, marginTop: '2px' }} />
+                    <div>
+                      <b style={{ color: 'var(--ink)' }}>Accessories not visible in photos:</b>{' '}
+                      <span>{(detail.completeness?.components || []).filter((c) => c.status === 'uncertain').map((c) => c.name).join(', ')}</span>
+                      <div style={{ marginTop: '2px', fontSize: '11px', color: 'var(--muted)' }}>
+                        Not depicted in before-sale reference photo (out of frame; not evaluated as present).
+                      </div>
+                    </div>
+                  </div>
+                )}
               </section>
 
               <section className="panel finding-panel">
@@ -814,6 +903,31 @@ export default function Inspection() {
                 )}
                 <div className="functional">
                   <LockKeyhole size={14} /> Functional test not performed
+                </div>
+
+                <div style={{
+                  marginTop: '12px',
+                  padding: '12px 14px',
+                  background: 'var(--canvas)',
+                  border: '1px solid var(--line)',
+                  borderRadius: '8px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '8px'
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 600, fontSize: '12.5px', color: 'var(--ink)' }}>
+                      <Sparkles size={14} style={{ color: '#0f3ea2' }} />
+                      Condition Assessment &amp; Disposition Rationale
+                    </span>
+                    <Pill value={reasoning.disposition === '—' ? 'UNCERTAIN' : reasoning.disposition.toUpperCase()} />
+                  </div>
+                  <div style={{ fontSize: '12px', lineHeight: '1.5', color: 'var(--ink)' }}>
+                    <b>Assessment:</b> {reasoning.conditionReason}
+                  </div>
+                  <div style={{ fontSize: '12px', lineHeight: '1.5', color: 'var(--muted)' }}>
+                    <b>Why this disposition:</b> {getDetailedDispositionExplanation(row, detail, reasoning)}
+                  </div>
                 </div>
               </section>
             </>
